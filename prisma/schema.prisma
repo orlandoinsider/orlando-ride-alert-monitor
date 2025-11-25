@@ -1,0 +1,58 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Minimal schema for ride alert monitoring
+// Only includes models needed for checking alerts
+
+model AccessToken {
+  id               String            @id @default(cuid())
+  token            String            @unique
+  userName         String
+  email            String?
+  smsEmail         String?           // SMS email address (e.g., 447762154700@sms.clicksend.com)
+  expiresAt        DateTime
+  isRevoked        Boolean           @default(false)
+  rideAlerts       RideAlert[]
+  rideReopenAlerts RideReopenAlert[]
+  
+  @@index([token])
+}
+
+model RideAlert {
+  id            String      @id @default(cuid())
+  accessTokenId String
+  accessToken   AccessToken @relation(fields: [accessTokenId], references: [id], onDelete: Cascade)
+  parkId        String      // e.g., "magic-kingdom", "hollywood-studios"
+  rideId        String      // e.g., "space-mountain", "tower-of-terror"
+  rideName      String      // Display name for the ride
+  maxWaitTime   Int         // Maximum acceptable wait time in minutes
+  isActive      Boolean     @default(true)
+  lastNotified  DateTime?   // Last time an email was sent
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  
+  @@index([accessTokenId])
+  @@index([isActive])
+}
+
+model RideReopenAlert {
+  id            String      @id @default(cuid())
+  accessTokenId String
+  accessToken   AccessToken @relation(fields: [accessTokenId], references: [id], onDelete: Cascade)
+  parkId        String      // e.g., "magic-kingdom", "hollywood-studios"
+  rideId        String      // e.g., "space-mountain", "tower-of-terror"
+  rideName      String      // Display name for the ride
+  isActive      Boolean     @default(true)
+  lastNotified  DateTime?   // Last time a notification was sent
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  
+  @@index([accessTokenId])
+  @@index([isActive])
+}

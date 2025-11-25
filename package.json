@@ -1,0 +1,26 @@
+{
+  "name": "ride-alert-monitor",
+  "version": "1.0.0",
+  "description": "Standalone ride alert monitoring service for Orlando Insider",
+  "main": "dist/index.js",
+  "scripts": {
+    "start": "node dist/index.js",
+    "build": "tsc",
+    "dev": "ts-node src/index.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "6.7.0",
+    "dotenv": "16.5.0",
+    "nodemailer": "^6.9.7"
+  },
+  "devDependencies": {
+    "@types/node": "20.6.2",
+    "@types/nodemailer": "^6.4.14",
+    "prisma": "6.7.0",
+    "ts-node": "10.9.2",
+    "typescript": "5.2.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
