@@ -12,6 +12,17 @@ import 'dotenv/config';
 import { PrismaClient } from '@prisma/client';
 import { sendRideAlertEmail, sendRideReopenEmail, testEmailConnection } from './email';
 import { QUEUE_TIMES_PARK_IDS, PARK_NAMES, RideWaitTime } from './constants';
+import http from 'http';
+
+// Health check server for Railway
+const PORT = process.env.PORT || 3000;
+const server = http.createServer((req, res) => {
+  res.writeHead(200, { 'Content-Type': 'text/plain' });
+  res.end('Ride Alert Monitor: OK\n');
+});
+server.listen(PORT, () => {
+  console.log(`✅ Health check server running on port ${PORT}`);
+});
 
 const prisma = new PrismaClient();
 
