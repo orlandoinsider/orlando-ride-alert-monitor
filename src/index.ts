@@ -135,14 +135,6 @@ async function monitorWaitTimeAlerts() {
           continue;
         }
 
-        // Check if we've already notified recently (within last 4 hours)
-        const fourHoursAgo = new Date(Date.now() - 4 * 60 * 60 * 1000);
-        if (alert.lastNotified && alert.lastNotified > fourHoursAgo) {
-          const timeAgo = Math.round((Date.now() - alert.lastNotified.getTime()) / (60 * 1000));
-          console.log(`      🔕 Already notified ${timeAgo} min ago (throttled)`);
-          continue;
-        }
-
         // Check if user has SMS email configured
         if (!alert.accessToken.smsEmail) {
           console.log(`      ⚠️  No SMS email configured for user`);
@@ -166,10 +158,13 @@ async function monitorWaitTimeAlerts() {
             userName: alert.accessToken.userName,
           });
 
-          // Update lastNotified timestamp
+          // Deactivate alert after notification (no throttling - one alert, one notification)
           await prisma.rideAlert.update({
             where: { id: alert.id },
-            data: { lastNotified: new Date() },
+            data: { 
+              lastNotified: new Date(),
+              isActive: false, // Deactivate after sending
+            },
           });
         } catch (emailError: any) {
           console.log(`      ❌ Failed to send notification:`, emailError.message);
@@ -221,14 +216,6 @@ async function monitorReopenAlerts() {
           continue;
         }
 
-        // Check if we've already notified recently (within last 4 hours)
-        const fourHoursAgo = new Date(Date.now() - 4 * 60 * 60 * 1000);
-        if (alert.lastNotified && alert.lastNotified > fourHoursAgo) {
-          const timeAgo = Math.round((Date.now() - alert.lastNotified.getTime()) / (60 * 1000));
-          console.log(`      🔕 Already notified ${timeAgo} min ago (throttled)`);
-          continue;
-        }
-
         // Check if user has SMS email configured
         if (!alert.accessToken.smsEmail) {
           console.log(`      ⚠️  No SMS email configured for user`);
@@ -244,10 +231,13 @@ async function monitorReopenAlerts() {
             smsEmail: alert.accessToken.smsEmail,
           });
 
-          // Update lastNotified timestamp
+          // Deactivate alert after notification (no throttling - one alert, one notification)
           await prisma.rideReopenAlert.update({
             where: { id: alert.id },
-            data: { lastNotified: new Date() },
+            data: { 
+              lastNotified: new Date(),
+              isActive: false, // Deactivate after sending
+            },
           });
         } catch (emailError: any) {
           console.log(`      ❌ Failed to send notification:`, emailError.message);
